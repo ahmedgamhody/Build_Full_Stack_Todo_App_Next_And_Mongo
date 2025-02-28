@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Nav from "./Nav";
 
 export function ModeToggle() {
   const { setTheme } = useTheme();
@@ -37,7 +38,7 @@ export function ModeToggle() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <p>test</p>
+      <Nav />
     </div>
   );
 }

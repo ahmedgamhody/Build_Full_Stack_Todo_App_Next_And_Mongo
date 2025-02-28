@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,16 +22,20 @@ import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  defaultTodoValues,
-  todoSchema,
-  TodoSchemaType,
-} from "./../validation/index";
+import { todoSchema, TodoSchemaType } from "./../validation/index";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
-import { createTodoAction } from "@/actions/todo.actions";
+import { updateTodoAction } from "@/actions/todo.actions";
+import { Pen } from "lucide-react";
+import { Todo } from "@prisma/client";
 
-export default function AddTodoModal({ userId }: { userId: string | null }) {
+export default function UpdateForm({ todo }: { todo: Todo }) {
+  const { title, body, completed } = todo;
+  const defaultTodoValues = {
+    title,
+    body: body || "",
+    completed,
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -44,7 +47,12 @@ export default function AddTodoModal({ userId }: { userId: string | null }) {
 
   const onSubmit = async (data: TodoSchemaType) => {
     setIsSubmitting(true);
-    await createTodoAction({ user_id: userId, ...data });
+    await updateTodoAction({
+      id: todo.id,
+      title: data.title,
+      body: data.body as string,
+      completed: data.completed,
+    });
     console.log("New Todo:", data);
     form.reset();
     setIsSubmitting(false);
@@ -56,16 +64,13 @@ export default function AddTodoModal({ userId }: { userId: string | null }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button>
-            <Plus size={14} />
-            New Todo
+            <Pen />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add New Todo</DialogTitle>
-            <DialogDescription>
-              Enter details for your new task.
-            </DialogDescription>
+            <DialogTitle> Update Todo</DialogTitle>
+            <DialogDescription>Update your todo list</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Form {...form}>
@@ -125,7 +130,7 @@ export default function AddTodoModal({ userId }: { userId: string | null }) {
 
                 <DialogFooter>
                   <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Adding..." : "Add"}
+                    {isSubmitting ? " Updating..." : "Update"}
                   </Button>
                 </DialogFooter>
               </form>
